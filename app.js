@@ -5,6 +5,7 @@ const bcrypt = require('bcrypt')
 const path = require('path')
 const app = express()
 const User = require('./schema/User')
+const Tweets = require('./schema/Tweets')
 const PORT = 3000
 app.set('view engine', 'ejs')
 app.set(express.static(path.join(__dirname, 'views')))
@@ -14,12 +15,11 @@ app.use(session({
   secret: 'keyboard cat',
   resave: false,
   saveUninitialized: true,
-  cookie: { secure: true }
 }))
 mongoose.connect('mongodb://127.0.0.1/twitterDB').then(() => console.log("DB connected")).catch(err => console.log(err));
 
 function isAuthenticated (req, res, next) {
-    if (req.session.emailId) next()
+    if(req.session.emailId) next()
     else res.redirect('/register')
 }  
 
@@ -67,6 +67,17 @@ app.post('/login',async (req, res) => {
           })
     }
     else res.redirect('/login')
+})
+
+app.get('/logout',(req, res) => {
+    req.session.emailId = null
+    req.session.save(function (err) {
+    if (err) next(err)
+    req.session.regenerate(function (err) {
+      if (err) next(err)
+      res.redirect('/')
+    })
+  })
 })
 
 app.listen(PORT,() => {
