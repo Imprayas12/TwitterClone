@@ -1,3 +1,7 @@
+if(process.env.NODE_ENV != "production") {
+    const dotnev = require('dotenv').config({ path : "./config.env"})
+} 
+
 const express = require('express')
 const session = require('express-session')
 const mongoose = require('mongoose')
@@ -6,18 +10,19 @@ const path = require('path')
 const app = express()
 const User = require('./schema/User')
 const Tweets = require('./schema/Tweets')
-const PORT = 3000
+const PORT = process.env.PORT || 3000
 app.set('view engine', 'ejs')
 app.set(express.static(path.join(__dirname,'views')))
 app.set(express.static(path.join(__dirname,'public')))
 app.use(express.urlencoded({extended:true}))
 app.set('trust proxy', 1) 
 app.use(session({
-  secret: 'keyboard cat',
+  secret: process.env.SESSION_SECRET || 'keyboard cat',
   resave: false,
   saveUninitialized: true,
 }))
-mongoose.connect('mongodb://127.0.0.1/twitterDB').then(() => console.log("DB connected")).catch(err => console.log(err));
+const DB_URL = process.env.DB_URL || "mongodb://127.0.0.1:27017/twitterDB"
+mongoose.connect(DB_URL).then(() => console.log("DB connected")).catch(err => console.log(err));
 
 function isAuthenticated (req, res, next) {
     if(req.session.emailId) next()
@@ -25,7 +30,6 @@ function isAuthenticated (req, res, next) {
 }  
 
 app.get('/',isAuthenticated, async (req, res) => {
-    const email = req.session.emailId;
     const tweets = await Tweets.find({})
     res.render('home',{tweets})
 })
