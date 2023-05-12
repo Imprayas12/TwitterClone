@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Profile</title>
+</head>
+<body>
+    <section>
+        <section>
+            <img src="<%= user.url %>" alt="user_img">
+            <h1><%= user.emailId %></h1>
+            <ul type = "none">
+                <% if (tweets) { %>
+                    <% for(tweet of tweets) { %>
+                        <li><%= tweet.tweetText %></li>
+                    <% } %>
+                <% } %>
+            </ul>
+        </section>
+    </section>
+    <button><a href="/">Home</a></button>
+</body>
+</html>

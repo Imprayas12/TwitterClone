@@ -8,7 +8,8 @@ const User = require('./schema/User')
 const Tweets = require('./schema/Tweets')
 const PORT = 3000
 app.set('view engine', 'ejs')
-app.set(express.static(path.join(__dirname, 'views')))
+app.set(express.static(path.join(__dirname,'views')))
+app.set(express.static(path.join(__dirname,'public')))
 app.use(express.urlencoded({extended:true}))
 app.set('trust proxy', 1) 
 app.use(session({
@@ -23,8 +24,17 @@ function isAuthenticated (req, res, next) {
     else res.redirect('/register')
 }  
 
-app.get('/',isAuthenticated, (req, res) => {
-    res.render('home')
+app.get('/',isAuthenticated, async (req, res) => {
+    const email = req.session.emailId;
+    const tweets = await Tweets.find({})
+    res.render('home',{tweets})
+})
+
+app.get('/profile',isAuthenticated, async(req, res) => {
+    const email = req.session.emailId;
+    const tweets = await Tweets.find({emailId:email})
+    const user = await User.find({emailId:email})
+    res.render('profile',{tweets,user})
 })
 
 app.get('/register',(req, res) => {
@@ -50,6 +60,7 @@ app.post('/register',(req, res) => {
 app.get('/login',(req, res) => {
     res.render('login')
 })
+
 
 app.post('/login',async (req, res) => {
     const {emailId, password} = req.body;
@@ -78,6 +89,15 @@ app.get('/logout',(req, res) => {
       res.redirect('/')
     })
   })
+})
+
+app.post('/uploadTweet',isAuthenticated, async (req, res) => {
+    const {tweet} = req.body;
+    await Tweets.create({
+        tweetText:tweet,
+        emailId: req.session.emailId
+    })
+    res.redirect('/')
 })
 
 app.listen(PORT,() => {

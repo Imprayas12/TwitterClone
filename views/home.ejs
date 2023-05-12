@@ -7,7 +7,27 @@
     <title>Twitter clone</title>
 </head>
 <body>
-    <section><h1>Welcome to twitter clone MF</h1></section>
+    <section>
+        <h1>Welcome to twitter clone</h1>
+        <ul type = "none"> 
+            <li>
+                <form action="/uploadTweet" method="post">
+                    <label for="tweet"></label>
+                    <textarea name="tweet" id="tweet" cols="30" rows="10" placeholder="What's happening?"></textarea>
+                    <button>Tweet</button>
+                </form>
+            </li>
+            <% if (tweets) { %>
+                <% for(tweet of tweets) { %>
+                    <ul>
+                        <img src="<%= tweet.url %>" alt="user_img">
+                       <span><%= tweet.tweetText %></span> 
+                    </ul>
+                <% } %>
+            <% } %>
+        </ul>
+    </section>
+    <button><a href="/profile">Profile</a></button>
     <button><a href="/logout">Logout</a></button>
 </body>
 </html>
